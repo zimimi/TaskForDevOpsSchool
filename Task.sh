@@ -26,7 +26,7 @@ cat > /etc/logrotate.d/nginx_logs_rotate_every_15min << 'EOM'
 	endscript
 	preremove
 		# перед видаленням відправляти зайвий файл на backuper@192.168.0.43:/var/log/storage
-		sudo scp -i /root/.ssh/backuper $1 backuper@192.168.0.43:/var/log/storage
+		sudo scp -i "/root/.ssh/backuper" $1 backuper@192.168.0.43:/var/log/storage
 	endscript
 }
 EOM
@@ -59,7 +59,7 @@ cat > /etc/logrotate.d/nginx_logs_rotate_every_day << 'EOM'
 	endscript
 	preremove
 		# перед видаленням відправляти зайвий файл на backuper@192.168.0.43:/var/log/storage
-		sudo scp -i /root/.ssh/backuper $1 backuper@192.168.0.43:/var/log/storage
+		sudo scp -i "/root/.ssh/backuper" $1 backuper@192.168.0.43:/var/log/storage
 	endscript
 }
 EOM
