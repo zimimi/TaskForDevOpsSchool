@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sudo apt update
 sudo apt install -y nginx
 
 cat > /etc/logrotate.d/nginx_logs_rotate_every_15min << 'EOM'
@@ -21,9 +21,11 @@ cat > /etc/logrotate.d/nginx_logs_rotate_every_15min << 'EOM'
 		sed -i 's/$[0-9a-f]\{32\}\$[a-zA-Z]\{2,3\}@[^@]*\.[^@ ]*/*****/g' $1
 	endscript
 	postrotate
+		# перезавантажити файли конфігурації, щоб nginx записував логи в новостворений файл access.log
 		invoke-rc.d nginx reload
 	endscript
 	preremove
+		# перед видаленням відправляти зайвий файл на backuper@192.168.0.43:/var/log/storage
 		sudo scp -i /root/.ssh/backuper $1 backuper@192.168.0.43:/var/log/storage
 	endscript
 }
@@ -52,13 +54,16 @@ cat > /etc/logrotate.d/nginx_logs_rotate_every_day << 'EOM'
 		sed -i 's/$[0-9a-f]\{32\}\$[a-zA-Z]\{2,3\}@[^@]*\.[^@ ]*/*****/g' $1
 	endscript
 	postrotate
+		# перезавантажити файли конфігурації, щоб nginx записував логи в новостворені файли chunga.log, error.log, seo.log, custom.log
 		invoke-rc.d nginx reload
 	endscript
 	preremove
+		# перед видаленням відправляти зайвий файл на backuper@192.168.0.43:/var/log/storage
 		sudo scp -i /root/.ssh/backuper $1 backuper@192.168.0.43:/var/log/storage
 	endscript
 }
 EOM
-
+# записати рядок */15 * * * * root logrotate -f /etc/logrotate.d/nginx_logs_rotate_every_15min у файл /etc/crontab
 sudo sh -c 'echo \*/15 \* \* \* \* root logrotate -f /etc/logrotate.d/nginx_logs_rotate_every_15min >> /etc/crontab'
+# записати рядок * 4 * * * root logrotate -f /etc/logrotate.d/nginx_logs_rotate_every_day у файл /etc/crontab
 sudo sh -c 'echo \* 4 \* \* \* root logrotate -f /etc/logrotate.d/nginx_logs_rotate_every_day >> /etc/crontab'
